@@ -1,5 +1,5 @@
 <?php
-class People
+abstract class People
 {
     public $firstname;
     public $lastname;
@@ -24,9 +24,7 @@ class People
         $this->password = $password;
     }
 
-    public function show_user()
-    {
-        echo "FirstName: $this->firstname <br> LastName: $this->lastname <br> Roll: $this->roll <br> User: $this->user <br>";
-    }
+    public abstract function show_user();
+    
 }
 ?>

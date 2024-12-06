@@ -4,10 +4,14 @@ class Author
     public $name;
     public $bibliography = [];
 
-    public function __construct($name,$bibliography)
+    public function __construct($name)
     {
         $this->name = $name;
-        $this->bibliography = $bibliography;
+    }
+
+    public function add_book(Book $book)
+    {
+        $this->bibliography[] = $book->title; 
     }
 
     public function show_details_author():void

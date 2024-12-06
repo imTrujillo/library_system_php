@@ -3,43 +3,45 @@ class Loan
 {
     public DateTime $loan_date;
     public DateTime $return_date;
+    public DateTime $current_date;
     public $state;
     public $user_id;
-    public $book_title;
+    public $book_id;
     public static $loans = [];
 
-    public function __construct(string $loan_date, string $return_date, $book_title, $user_id)
+    public function __construct(string $loan_date, string $return_date, string $current_date, $book_id, $user_id)
     {
         $this->loan_date = new DateTime($loan_date);
         $this->return_date = new DateTime($return_date);
-        $this->book_title = $book_title;
+        $this->current_date = new DateTime($current_date);
+        $this->book_id = $book_id;
         $this->user_id = $user_id;
         $this->state = "Active";
+
+        self::$loans[] = $this;
     }
 
-    public static function cancel_loan($book_title, User $user):void
+    public static function cancel_loan($book_id, User $user, Library $library)
     {
         foreach (self::$loans as $loan) {
-            if ($loan->book_title == $book_title && $loan->user_id == $user->user_id) {
+            if ($loan->book_id == $book_id && $loan->user_id == $user->user_id && $loan->state === "Active") {
                 $loan->state = "Cancelled";
                 $user->borrowed_books--;
-                $book['borrowed'] = false;
-                echo "The loan for book: $book_title is cancelled. <br>";
+                $library->update_book_status($book_id, false);
+                echo "The loan for book with ID: $book_id is $loan->state. <br>";
                 return;
             }
         }
-        echo "The loan with userID: $user->user_id and book: $book_title wasn't found. <br>";
+        echo "The loan with userID: $user->user_id and bookID: $book_id wasn't found. <br>";
     }
-    public static function create_loan($loan_date, $return_date, $book_title, $user_id):void
+    public function create_loan()
     {
-        $loan = new Loan($loan_date, $return_date, $book_title, $user_id);
-        self::$loans[] = $loan;
-        echo "The loan for book: $book_title and userID: $user_id is added. <br>";
+        self::$loans[] = $this;
+        echo "The loan for book with ID: $this->book_id and userID: $this->user_id is added. <br>";
     }
-    public function is_book_late($current_date): bool
+    public function is_book_late(): bool
     {
-        $current_date_datetime = new DateTime($current_date);
-        if ($current_date_datetime > $this->return_date) {
+        if ($this->current_date > $this->return_date) {
             echo "The book borrowed is late. <br>";
             return true;
         } else {
